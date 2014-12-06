@@ -1,0 +1,173 @@
+body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: rgb(248, 248, 248);
+    margin: 0;
+    padding: 0;
+    overflow:hidden;
+    font-family: arial;
+    font-size: 10px;
+}
+
+#btnDiv {
+    position: relative;
+    border: 2px;
+    width: 50px;
+    margin: 0 auto;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    text-align: center;
+    z-index: 5;
+}
+
+#helpBtn {
+    margin: 0 auto;
+}
+
+#colorPalette {
+    margin: 0 auto;
+    z-index: 5;
+}
+
+#shapeDiv {
+    width: 93px:
+    margin: 0 auto;
+}
+
+
+#shapeSelectionDiv {
+    position: relative;
+    z-index: 5;
+}
+
+.colorBar:hover  {
+    cursor: pointer;
+}
+
+.colorBar {
+    height: 8px;
+    width: 50px;
+    margin: 0 auto;
+    border: 2px solid #000000;
+}
+
+#toolbox {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 1em;
+    border: 2px solid #EEEEEE;
+    border-radius: 5px;
+    padding: 1em;
+    z-index: 5;
+}
+
+#toolbox input {
+    width: 30px;
+    opacity: 0.4;
+}
+
+#circleSelection:hover,
+#rectangleSelection:hover,
+#diamondSelection:hover,
+#ellipseSelection:hover, 
+#solidEdgeSelection:hover,
+#dashedEdgeSelection:hover,
+#noBorderSelection:hover {
+    opacity: 1;
+    fill: rgb(200, 238, 241);
+    cursor: pointer;
+    stroke: #000000;
+}
+
+.unsel {
+    opacity: 0.4;
+    stroke: #000000;
+}
+
+.sel {
+    opacity: 1.0;
+}
+
+#edgeStyleSelectionSvg, #shapeSelectionSvg {
+    text-align: center;
+    display: block;
+    margin: auto;
+}
+
+.edgeStyleRect {
+    stroke: rgb(248, 248, 248);
+    fill: rgb(248, 248, 248);
+}
+
+#toolbox input:hover {
+    opacity: 1;
+    cursor: pointer;
+}
+
+#hidden-file-upload {
+    display: none;
+}
+
+#download-input {
+    margin: 0 0.5em;
+}
+
+.conceptG text {
+    pointer-events: none;
+}
+
+g.conceptG circle, g.conceptG rect, g.conceptG ellipse, g.conceptG path,
+#shapeSelectionSvg circle, #shapeSelectionSvg rect, #shapeSelectionSvg ellipse  {
+    fill: #F6FBFF;
+    stroke: #333;
+    stroke-width: 2px;
+}
+
+g text {
+/*    text-shadow: 1px 1px #000000; */
+}
+
+g circle, g rect, g ellipse, g path {
+    fill: rgb(248, 248, 248);
+}
+
+g.conceptG:hover circle, g.conceptG:hover rect, g.conceptG:hover ellipse, g.conceptG:hover path,
+{
+    fill: rgb(200, 238, 241);
+}
+
+g.selected circle, g.selected rect, g.selected ellipse, g.selected path {
+    fill: rgb(250, 232, 255);
+}
+
+g.selected:hover circle, g.selected:hover rect, g.selected:hover ellipse, g.selected:hover path {
+    fill: rgb(250, 232, 255);
+}
+
+path.link {
+    fill: none;
+    stroke: #333;
+    stroke-width: 3px;
+    cursor: default;
+}
+
+path.link:hover {
+    stroke: rgb(94, 196, 204);
+}
+
+g.connect-node circle {
+    fill: #BEFFFF;
+}
+
+path.link.hidden {
+    stroke-width: 0;
+}
+
+path.link.selected {
+    stroke: rgb(229, 172, 247);
+}
