@@ -65,7 +65,6 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
     defs.append("svg:marker")
       .attr("id", "mark-end-arrow")
       .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 7)
       .attr("markerWidth", 3.5)
       .attr("markerHeight", 3.5)
       .attr("orient", "auto")
@@ -478,7 +477,6 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
 
   GraphCreator.prototype.getBiggestNodeID = function() {
     var currMax = 0;
-
     for (var i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i].id > currMax) {
         currMax = this.nodes[i].id;
@@ -1101,7 +1099,7 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
     var w = edge.target.width / 2;
     var h = edge.target.height / 2;
     var transitionCos = h / Math.sqrt(w * w + h * h); // cos of angle where intersect switches sides
-    var offset = 17; // Give the arrow a little breathing room
+    var offset = 22; // Give the arrow a little breathing room
     return ((absCosTheta > transitionCos) ? h * hyp / dy : w * hyp / dx) + offset;
   };
 
