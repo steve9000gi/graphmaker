@@ -1,7 +1,6 @@
-// Build a graph with nodes of several shapes and colors, and connect them with directed edges that
-// share the color of the target node. Save a constructed graph locally as a json file, and open
-// saved graph files.
-// Author: Steve Chall, RENCI UNC
+// Build a graph with nodes of several shapes and colors, and connect them with directed edges.
+// Save a constructed graph locally as a json file, and open saved graph files.
+// Author: Steve Chall, RENCI UNC-CH
 // Based on Colorado Reed's https://github.com/cjrd/directed-graph-creator.
 
 document.onload = (function(d3, saveAs, Blob, undefined) {
@@ -50,11 +49,10 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
     // Define arrow markers for graph links (i.e., edges that persist after mouse up)
     var defs = d3.select("svg").append("svg:defs");
     defs.selectAll("marker")
-         .data(thisGraph.colorChoices)
+        .data(thisGraph.colorChoices)
       .enter().append("marker")
         .attr("id", function(d) { return "end-arrow" + d; })
         .attr("viewBox", "0 -5 10 10")
-        //.attr("refX", "10")
         .attr("markerWidth", 3.5)
         .attr("markerHeight", 3.5)
         .attr("orient", "auto")
@@ -81,27 +79,25 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
 
     // Displayed when dragging between nodes
     thisGraph.dragLine = svgG.append("svg:path")
-          .attr("class", "link dragline hidden")
-          .attr("d", function(d) { return "M0,0L0,0"; })
-          .style("marker-end", "url(#mark-end-arrow)");
+      .attr("class", "link dragline hidden")
+      .attr("d", function(d) { return "M0,0L0,0"; })
+      .style("marker-end", "url(#mark-end-arrow)");
 
     // Svg nodes and links
     thisGraph.paths = svgG.append("g").selectAll("g");
     thisGraph.shapes = svgG.append("g").selectAll("g");
 
     thisGraph.drag = d3.behavior.drag()
-          .origin(function(d) {
-            var dx = d.x;
-            var dy = d.y;
-            return {x: dx, y: dy};
-          })
-          .on("drag", function(args) {
-            thisGraph.state.justDragged = true;
-            thisGraph.dragmove.call(thisGraph, args);
-          })
-          .on("dragend", function() {
-            // Todo check if edge-mode is selected
-          });
+      .origin(function(d) {
+	return {x: d.x, y: d.y};
+      })
+      .on("drag", function(args) {
+	thisGraph.state.justDragged = true;
+	thisGraph.dragmove.call(thisGraph, args);
+      })
+      .on("dragend", function() {
+	// Todo check if edge-mode is selected
+      });
 
     // Listen for key events
     d3.select(window).on("keydown", function() {
@@ -115,25 +111,25 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
 
     // Listen for dragging
     var dragSvg = d3.behavior.zoom()
-          .on("zoom", function() {
-            if (d3.event.sourceEvent.shiftKey) {
-              // TODO  the internal d3 state is still changing
-              return false;
-            } else {
-              thisGraph.zoomed.call(thisGraph);
-            }
-            return true;
-          })
-          .on("zoomstart", function() {
-            var ael = d3.select("#" + thisGraph.consts.activeEditId).node();
-            if (ael) {
-              ael.blur();
-            }
-            if (!d3.event.sourceEvent.shiftKey) d3.select("body").style("cursor", "move");
-          })
-          .on("zoomend", function() {
-            d3.select("body").style("cursor", "auto");
-          });
+      .on("zoom", function() {
+	if (d3.event.sourceEvent.shiftKey) {
+	  // TODO  the internal d3 state is still changing
+	  return false;
+	} else {
+	  thisGraph.zoomed.call(thisGraph);
+	}
+	return true;
+      })
+      .on("zoomstart", function() {
+	var ael = d3.select("#" + thisGraph.consts.activeEditId).node();
+	if (ael) {
+	  ael.blur();
+	}
+	if (!d3.event.sourceEvent.shiftKey) d3.select("body").style("cursor", "move");
+      })
+      .on("zoomend", function() {
+	d3.select("body").style("cursor", "auto");
+      });
 
     svg.call(dragSvg).on("dblclick.zoom", null);
 
@@ -211,7 +207,7 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
 
   /* PROTOTYPE FUNCTIONS */
 
-  // Edge, shape, and color selection, along with a "?" help button, load, saye, and delete.
+  // Edge, shape, and color selection, along with a "?" help button, load, save, and delete.
   GraphCreator.prototype.prepareToolbox = function() {
     var thisGraph = this;
     thisGraph.sssw = thisGraph.consts.minCircleRadius * 4 + 23; // Shape Selection Svg Width
@@ -537,7 +533,6 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
       thisGraph.dragLine.attr("d", "M" + d.x + "," + d.y + "L" + d3.mouse(thisGraph.svgG.node())[0]
           + "," + d3.mouse(this.svgG.node())[1]);
     } else {
-      //console.log("dragmove(d); !shiftNodeDrag: d = " + JSON.stringify(d));
       d.x += d3.event.dx;
       d.y +=  d3.event.dy;
       thisGraph.updateGraph();
@@ -570,7 +565,7 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
   };
 
 
-  // Insert svg line breaks: taken from http://stackoverflow.com/questions/13241475/
+  // Insert svg line breaks: based on http://stackoverflow.com/questions/13241475/
   // how-do-i-include-newlines-in-labels-in-d3-charts 
   //
   // Now also resizes nodes to hold all the text. 2do: refactor.
@@ -645,18 +640,18 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
        .attr("rx", Math.max(textSize.width / 2 + 20, this.consts.ellipseRx))
        .attr("ry", Math.max(textSize.height / 2 + 17, this.consts.ellipseRy));
 
-    // Create a boundary value for determining arrowhead positions on edges:
+    // Prepare a boundary value for determining arrowhead positions on edges:
     var minBoundaryRadius = Math.sqrt(rectWidth * rectWidth + rectHeight * rectHeight) / 2;
     switch (gEl[0][0].__data__.shape) {
       case "rectangle":
-        d.width = gEl.select("rect").attr("width"); // Store for computeRectangleBoundary
+        d.width = gEl.select("rect").attr("width"); // Store for computeRectangleBoundary(...)
         d.height = gEl.select("rect").attr("height");
         break;
       case "diamond":
         d.boundary = dim / 2 + 16;
         break;
       case "ellipse":
-        d.rx = gEl.select("ellipse").attr("rx"); // Store rx, ry for computeEllipseBoundary
+        d.rx = gEl.select("ellipse").attr("rx"); // Store for computeEllipseBoundary(...)
         d.ry = gEl.select("ellipse").attr("ry");
         break;
       case "circle":
@@ -741,7 +736,6 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
 
   // Mousedown on node
   GraphCreator.prototype.shapeMouseDown = function(d3node, d) {
-    //console.log("shapeMouseDown(d3node, d): d = " + JSON.stringify(d));
     var thisGraph = this,
         state = thisGraph.state;
     d3.event.stopPropagation();
@@ -1023,18 +1017,7 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
 	 .classed("shape", true)
 	 .attr("class", function(d) { return d.shape; })
 	 .style("stroke", function(d) { return d.color; })
-	 .style("stroke-width", function(d) { return (d.shape == "noBorder") ? 0 : 2; });
-
-    // Now assign attributes peculiar to each kind of shape:
-    newGs.selectAll("circle")
-	 .attr("cx", 0)
-	 .attr("cy", 0);
-    newGs.selectAll(".rectangle")
-	 .attr("x", 0)
-	 .attr("y", 0);
-    newGs.selectAll(".ellipse")
-	 .attr("cx", 0)
-	 .attr("cy", 0);
+	 .style("stroke-width", function(d) { return (d.shape === "noBorder") ? 0 : 2; });
 
     newGs.each(function(d) {
       thisGraph.insertTitleLinebreaks(d3.select(this), d);
@@ -1048,7 +1031,7 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
 
     var paths = thisGraph.paths;
 
-    // Update existing paths
+    // Update existing paths, setting edge color to target color if not specified:
     paths.style("marker-end", function(d) { 
       var clr = d.color ? d.color.substr(1) : d.target.color.substr(1)
                   //return "url(#end-arrow" + d.target.color.substr(1) + ")"; })
@@ -1060,12 +1043,11 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
         return thisGraph.setPath(d);
       });
 
-    // Add new paths
+    // Add new paths, setting edge color to target color if not specified:
     paths.enter()
       .append("path")
       .style("marker-end", function(d) {
-        var clr = d.color ? d.color.substr(1) : d.target.color.substr(1)
-                  //return "url(#end-arrow" + d.target.color.substr(1) + ")"; })
+        var clr = d.color ? d.color.substr(1) : d.target.color.substr(1);
         return "url(#end-arrow" + clr + ")"; })
       .classed("link", true)
       .style("stroke", function(d) { return d.color? d.color : d.target.color; })
@@ -1101,68 +1083,35 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
     svg.attr("width", x).attr("height", y);
   };
 
+
   // http://warpycode.wordpress.com/2011/01/21/calculating-the-distance-to-the-edge-of-an-ellipse/
   // Angle theta is measured from the -y axis (recalling that +y is down) clockwise.
   GraphCreator.prototype.computeEllipseBoundary = function(edge) {
     var dx = edge.target.x - edge.source.x;
     var dy = edge.target.y - edge.source.y;
-    var a  = edge.target.rx,
-        b  = edge.target.ry;
+    var rx  = edge.target.rx,
+        ry  = edge.target.ry;
     var h = Math.sqrt(dx * dx + dy * dy);
     var s = dx / h; // sin theta
     var c = dy / h; // cos theta
-    var length = Math.sqrt(1 / ((s / a) * (s / a) + (c / b) * (c / b)));
-    return length + 15;
+    var length = Math.sqrt(1 / ((s / rx) * (s / rx) + (c / ry) * (c / ry)));
+    var offset = 15;
+    return length + offset;
   };
 
 
   // Angle theta is measured from -y axis (up) clockwise.
   GraphCreator.prototype.computeRectangleBoundary = function(edge) {
-    var dx = edge.source.x - edge.target.x;
-    var dy = edge.target.y - edge.source.y;
+    var dx = Math.abs(edge.source.x - edge.target.x);
+    var dy = Math.abs(edge.target.y - edge.source.y);
     var hyp = Math.sqrt(dx * dx + dy * dy);
-    var c = dy / hyp; // cos theta
+    var absCosTheta = dy / hyp; // Absolute value of cosine theta
     var w = edge.target.width / 2;
     var h = edge.target.height / 2;
-    var transitionCos = h / Math.sqrt(w * w + h * h);
+    var transitionCos = h / Math.sqrt(w * w + h * h); // cos of angle where intersect switches sides
+    var offset = 17; // Give the arrow a little breathing room
 
-    return ((Math.abs(c) > transitionCos) ? Math.abs(h * hyp / dy) : Math.abs(w * hyp / dx)) + 17;
-/*
-    var offset = 17;
-    var s = dx / hyp; // sin theta
-    if (s >= 0) {
-      if (c >= 0) { // Quadrant I
-        if (c > transitionCos) { 
-          length = h * hyp / dy;
-          offset = 20;
-        } else {
-          length = w * hyp / dx;
-        }
-      } else { // Quadrant II: cos theta < 0, sin theta > 0
-        if (Math.abs(c) <= transitionCos) {
-          length = w * hyp / dx;  
-        } else {
-          length = -h * hyp / dy;
-        }
-      }
-    } else { // Quadrant III and IV
-      if (c < 0) { // Quadrant III
-        if (Math.abs(c) > transitionCos) {
-          length = -h * hyp / dy;
-        } else {
-          length = -w * hyp / dx;
-        }
-      } else  { // Quadrant IV
-        if (c <= transitionCos) {
-          length = -w * hyp / dx;
-        } else {
-          length = h * hyp / dy;
-          offset = 20;
-        }
-      }
-    }
-    return length + offset;
-*/
+    return ((absCosTheta > transitionCos) ? h * hyp / dy : w * hyp / dx) + offset;
   };
 
 
@@ -1197,10 +1146,7 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
 
   var width = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth,
       height =  window.innerHeight|| docEl.clientHeight|| bodyEl.clientHeight;
-
-  var xLoc = width / 2 - 25,
-      yLoc = 100;
-
+  
   // Initial node data
   var nodes = [];
   var links = [];
