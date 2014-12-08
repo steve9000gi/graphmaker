@@ -8,7 +8,7 @@ Based on http://bl.ocks.org/cjrd/6863459
 Operation:
 
 * Drag/scroll to translate/zoom.
-* Click on a shape in the toolbar to select node shape (or a for a node with none use "no border").
+* Click on a shape in the toolbar to select node shape (or for a node with none use "no border").
 * Click on a color in the toolbar to select a color for creating new nodes and edges.
 * Shift-click on empty space to create a node of the selected shape and color.
 * Click on the appropriate arrow in the toolbar to select edge style: dashed or solid.

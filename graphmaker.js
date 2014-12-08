@@ -145,7 +145,7 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
       });
       var blob = new Blob([window.JSON.stringify({"nodes": thisGraph.nodes, "links": saveEdges})], 
                                                  {type: "text/plain;charset=utf-8"});
-      saveAs(blob, "mydag.json");
+      saveAs(blob, "graph.json");
     });
 
     // Handle uploaded data
@@ -182,7 +182,6 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
           }
         };
         filereader.readAsText(uploadFile);
-
       } else {
         alert("Your browser won't let you save this graph -- try upgrading your browser to IE 10+ "
             + "or Chrome or Firefox.");
@@ -201,8 +200,9 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
     DELETE_KEY: 46,
     ENTER_KEY: 13,
     minCircleRadius: 20,
-    ellipseRx: 25,
-    ellipseRy: 17  
+    minDiamondDim: 45,
+    minEllipseRx: 25,
+    minEllipseRy: 17  
   };
 
   /* PROTOTYPE FUNCTIONS */
@@ -234,32 +234,32 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
       .attr("value", "?")
       .on("click", function(d) {
 	 alert("\u26a1 Drag/scroll to translate/zoom.\n"
-	      + "\u26a1 Click on a shape in the toolbar to select node shape (or none with "
-              + "\"no border\")."
-	      + "\n"
-	      + "\u26a1 Click on arrow in toolbar to select edge style: dashed or solid.\n"
-	      + "\u26a1 Shift-click on empty space to create a node of the selected shape.\n"
+	      + "\u26a1 Click on a shape in the toolbar to select node shape (or for a node with "
+              + "none use \"no border\").\n"
+	      + "\u26a1 Click on a color in the toolbar to select a color for creating new nodes "
+              + "and edges.\n"
+	      + "\u26a1 Shift-click on empty space to create a node of the selected shape and "
+              + "color.\n"
+	      + "\u26a1 Click on an arrow in the toolbar to select edge style: dashed or solid.\n"
 	      + "\u26a1 Shift-click on a node, then drag to another node to connect them with an "
 	      + "edge.\n"
-	      + "\u26a1 Shift-click on a node to change its text.\n"
-	      + "\u26a1 Click on node or edge to select and press backspace/delete to delete.\n"
-	      + "\u26a1 Click on a color bar to select a color for creating new nodes and edges.\n"
-	      + "\u26a1 If the text is bold and underlined, the node has an external url. "
-	      + "Control-click on that node to open the link.\n"
-	      + "\u26a1 Alt-click on a node to see, attach new or change existing url.\n"
+	      + "\u26a1 Shift-click on a node's text to edit.\n"
+	      + "\u26a1 Click on node or edge to select and press backspace/delete to delete."
+              + " Note: a node's background turns blue when you're hovering over it, and pink when "
+              + "selected.\n"
+	      + "\u26a1 Control-click on a node with underlined text to open the external url "
+              + "associated with that node.\n"
+	      + "\u26a1 Alt-click on a node to see, attach new (or change existing) url.\n"
 	      + "\u26a1 Click on the cloud with the up-arrow to open/upload a file from your "
 	      + "machine.\n"
 	      + "\u26a1 Click on the square with the down-arrow to save the graph to your "
               + "computer.\n"
-	      + "\u26a1 Note: a node turns light blue when you're hovering over it, and pink when "
-            + "selected\n"
        );
     });
     
     // Create color palette:
     d3.select("#toolbox").insert("div", ":first-child")
       .attr("id", "colorPalette");
-
     d3.select("#colorPalette").selectAll(".colorBar")
         .data(thisGraph.colorChoices)
       .enter().append("div")
@@ -281,14 +281,11 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
             return "url(#end-arrow" + thisGraph.clr.substr(1) + ")";
         });
       });
-
     // Set initial color selection to black:
     d3.select("#clr000000").style("border-color", "#ffffff");
-
     // Add shape selection:
     d3.select("#toolbox").insert("div", ":first-child")
       .attr("id", "shapeSelectionDiv");
-
     d3.select("#shapeSelectionDiv").append("svg")
       .attr("id", "shapeSelectionSvg")
       .attr("width", thisGraph.sssw)
@@ -354,8 +351,8 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
       .attr("id", "ellipseSelection")
       .attr("cx", thisGraph.sssw / 2)
       .attr("cy", thisGraph.ssEllipseCy + 18)
-      .attr("rx", thisGraph.consts.ellipseRx)
-      .attr("ry", thisGraph.consts.ellipseRy)
+      .attr("rx", thisGraph.consts.minEllipseRx)
+      .attr("ry", thisGraph.consts.minEllipseRy)
       .style("stroke", thisGraph.unselected)
       .style("stroke-width", 2)
       .classed("sel", false).classed("unsel", true)
@@ -364,7 +361,7 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
    d3.select("#shapeSelectionSvg").append("text")
      .attr("id", "noBorderSelection")
      .attr("text-anchor","middle")
-     .attr("x", thisGraph.consts.ellipseRx * 2)
+     .attr("x", thisGraph.consts.minEllipseRx * 2)
      .attr("y", thisGraph.ssNoBorderXformY + thisGraph.minRectSide * 0.7)
      .classed("unsel", true).classed("sel", false)
      .style("fill", thisGraph.unselected)
@@ -374,7 +371,6 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
     // Add edge style selection:
     d3.select("#toolbox").insert("div", ":first-child")
       .attr("id", "edgeStyleSelectionDiv");
-
     d3.select("#edgeStyleSelectionDiv").append("svg")
       .attr("id", "edgeStyleSelectionSvg")
       .attr("width", "93px")
@@ -477,7 +473,7 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
 
   GraphCreator.prototype.setIdCt = function(idct) {
     this.idct = idct;
-    }
+  }
 
 
   GraphCreator.prototype.getBiggestNodeID = function() {
@@ -503,7 +499,6 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
       colorArray.push(currentRgb.substr(1)); // Lop off the "#"
     }
     colorArray.push("000000"); // Include black
-
     return colorArray;
   }
 
@@ -522,7 +517,6 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
       .style("stroke", this.unselected)
       .classed("unsel", true)
       .classed("sel", false);
-
     this.edgeStyle = (selectedID === "#solidEdgeSelection") ? "solid" : "dashed";
   }
 
@@ -572,7 +566,6 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
   GraphCreator.prototype.insertTitleLinebreaks = function (gEl, d) {
     var words = d.name.split(/\s+/g),
         nwords = words.length;
-
     // Create lines of text from single words:
     var phrases = [];
     var wordIx = 0;
@@ -607,7 +600,6 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
           .attr("dy",  function(d) {
             return "-" + (nPhrases - 1) * 6;
           });
-
     for (var i = 0; i < nPhrases; i++) {
       var tspan = el.append("tspan")
         .text(phrases[i]);
@@ -621,7 +613,7 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
     var rectWidth = Math.max(textSize.width, this.minRectSide);
     var rectHeight = Math.max(textSize.height, this.minRectSide);
     var maxTextDim = Math.max(textSize.width, textSize.height);
-    var dim = Math.max(maxTextDim * 1.6, 45);
+    var dim = Math.max(maxTextDim * 1.6, this.consts.minDiamondDim);
 
     gEl.select("circle")
        .attr("r", Math.max(maxTextDim / 2 + 8, this.consts.minCircleRadius));
@@ -637,8 +629,8 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
        })
        .attr("transform", function (d) { return "translate(-" + dim / 2 + ",-" + dim /2 + ")"; });
     gEl.select("ellipse")
-       .attr("rx", Math.max(textSize.width / 2 + 20, this.consts.ellipseRx))
-       .attr("ry", Math.max(textSize.height / 2 + 17, this.consts.ellipseRy));
+       .attr("rx", Math.max(textSize.width / 2 + 20, this.consts.minEllipseRx))
+       .attr("ry", Math.max(textSize.height / 2 + 17, this.consts.minEllipseRy));
 
     // Prepare a boundary value for determining arrowhead positions on edges:
     var minBoundaryRadius = Math.sqrt(rectWidth * rectWidth + rectHeight * rectHeight) / 2;
@@ -1110,7 +1102,6 @@ document.onload = (function(d3, saveAs, Blob, undefined) {
     var h = edge.target.height / 2;
     var transitionCos = h / Math.sqrt(w * w + h * h); // cos of angle where intersect switches sides
     var offset = 17; // Give the arrow a little breathing room
-
     return ((absCosTheta > transitionCos) ? h * hyp / dy : w * hyp / dx) + offset;
   };
 
