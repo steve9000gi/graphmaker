@@ -1,4 +1,4 @@
-graphbuilder
+graphmaker
 ======================
 
 Interactive tool for creating directed graphs, created using d3.js.
