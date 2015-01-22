@@ -9,7 +9,7 @@ body {
   padding: 0;
   overflow:hidden;
   font-family: arial;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 #graph {
@@ -52,9 +52,8 @@ body {
   z-index: 5;
 }
 
-.colorBar:hover, #menuDiv:hover  {
+.colorBar:hover, #menuDiv:hover, #eqShapeSizeSubmenuDiv:hover  {
   cursor: pointer;
-  border: 2px solid #888888;
 }
 
 .colorBar {
@@ -150,7 +149,6 @@ g.selected:hover circle, g.selected:hover rect, g.selected:hover ellipse, g.sele
 path.link {
   fill: none;
   stroke: #333;
-  stroke-width: 3px;
   cursor: default;
 }
 
@@ -201,13 +199,25 @@ path.link.selected, g.pathG.selected path {
   display: none;
 }
 
-.circleHidden {
+.circleHidden, .ssmHidden {
   display: none;
 }
 
-.circleOfCare {
+.circleOfCare, .ssmVisible {
   display: inline-block;
   stroke: #000000;
   stroke-width: 1px;
   fill: none;
+}
+.ssmCircle {
+  display: inline-block;
+  stroke-width: 1px;
+  fill: none;
+}
+
+.ssmLabel {
+  text-align: center;
+  stroke: none;
+  fill: #000000;
+  position: absolute;
 }
